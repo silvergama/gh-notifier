@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -10,6 +9,27 @@ import (
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
+
+type Notification struct {
+	Title string
+	Type  string
+	URL   string
+}
+
+func NewNotification(ghn *github.Notification) *Notification {
+	return &Notification{
+		Title: ghn.GetRepository().GetName(),
+		Type:  ghn.GetSubject().GetType(),
+		URL:   ghn.GetSubject().GetURL(),
+	}
+}
+
+func (n Notification) Notify() {
+	err := beeep.Notify(n.Title, n.Type, "")
+	if err != nil {
+		log.Fatalf("Error %v", err)
+	}
+}
 
 func main() {
 	token := os.Getenv("GH_TOKEN")
@@ -25,10 +45,7 @@ func main() {
 		log.Fatalf("error: %v", err)
 	}
 	for _, o := range orgs {
-		fmt.Println(o.GetRepository().GetFullName())
-		err := beeep.Notify("Title", "Message body", "assets/information.png")
-		if err != nil {
-			log.Fatalf("Error %v", err)
-		}
+		n := NewNotification(o)
+		n.Notify()
 	}
 }
