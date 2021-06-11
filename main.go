@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gen2brain/beeep"
 	"github.com/google/go-github/github"
@@ -11,9 +12,10 @@ import (
 )
 
 func main() {
+	token := os.Getenv("GH_TOKEN")
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: "token"},
+		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
